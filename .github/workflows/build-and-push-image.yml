@@ -6,6 +6,11 @@ jobs:
     build-image:
         runs-on: ubuntu-latest
         steps:
+            - 
+                uses: actions/checkout@v4
+            - 
+                uses: benjlevesque/short-sha@v3.0
+                id: short-sha
             -
                 name: setup QEMU
                 uses: docker/setup-qemu-action@v3
@@ -25,4 +30,4 @@ jobs:
                     IMG_NAME: ${{vars.DOCKERHUB_NAME}}/${{vars.DOCKERHUB_IMG_PREFIX}}-accommodation-api
                 with:
                     push: true
-                    tags: ${{env.IMG_NAME}}:latest, ${{env.IMG_NAME}}:${GITHUB_SHA::7}
+                    tags: ${{env.IMG_NAME}}:latest, ${{env.IMG_NAME}}:${{steps.short-sha.outputs.sha}}
