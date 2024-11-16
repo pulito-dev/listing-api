@@ -1,0 +1,28 @@
+name: test workflow
+on:
+    - push
+
+jobs:
+    build-image:
+        runs-on: ubuntu-latest
+        steps:
+            -
+                name: setup QEMU
+                uses: docker/setup-qemu-action@v3
+            -
+                name: setup docker buildx
+                uses: docker/setup-buildx-action@v3
+            -
+                name: login to docker hub
+                uses: docker/login-action@v3
+                with:
+                    username: ${{vars.DOCKERHUB_USER}}
+                    password: ${{secrets.DOCKERHUB_PASS}}
+            -
+                name: build and push
+                uses: docker/build-push-action@v6
+                env:
+                    IMG_NAME: ${{vars.DOCKERHUB_USER}}/${{vars.DOCKERHUB_IMG_PREFIX}}-accommodation-api
+                with:
+                    push: true
+                    tags: ${{env.IMG_NAME}}:latest, ${{env.IMG_NAME}}:${GITHUB_SHA::7}
