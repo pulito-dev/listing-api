@@ -30,4 +30,4 @@ jobs:
                     IMG_NAME: ${{vars.DOCKERHUB_NAME}}/${{vars.DOCKERHUB_IMG_PREFIX}}-listing-api
                 with:
                     push: true
-                    tags: ${{env.IMG_NAME}}:latest, ${{env.IMG_NAME}}:${{steps.short-sha.outputs.sha}}
+                    tags: ${{env.IMG_NAME}}:${{steps.short-sha.outputs.sha}}, ${{env.IMG_NAME}}:latest
