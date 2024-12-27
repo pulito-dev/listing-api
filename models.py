@@ -2,6 +2,7 @@ from decimal import Decimal
 from .core.config import config
 from datetime import datetime, UTC
 from sqlmodel import Field, SQLModel
+import sqlalchemy as sa
 
 
 # base model for all models
@@ -45,10 +46,10 @@ class UpdateListing(BaseModel):
 class Listing(BaseModel, table=True):
     id: int = Field(primary_key=True, default=None)
     payout: Decimal = Field(default=20.00, max_digits=6, decimal_places=2)
-    to_be_cleaned_from: datetime | None
-    to_be_cleaned_before: datetime | None
+    to_be_cleaned_from: datetime | None = Field(sa_column=sa.Column(sa.DateTime(timezone=True), nullable=True))    # https://github.com/fastapi/sqlmodel/issues/21#issuecomment-905955411
+    to_be_cleaned_before: datetime | None = Field(sa_column=sa.Column(sa.DateTime(timezone=True), nullable=True))
     description: str | None
-    posted_on: datetime | None = Field(default_factory=lambda: datetime.now(UTC))
+    posted_on: datetime | None = Field(sa_column=sa.Column(sa.DateTime(timezone=True), nullable=False), default_factory=lambda: datetime.now(UTC))
 
     accommodation_id: int
 

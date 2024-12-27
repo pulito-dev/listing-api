@@ -1,6 +1,7 @@
 from ..models import *
-from sqlmodel import Session, create_engine, SQLModel
+from sqlmodel import Session, SQLModel
 from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.schema import CreateSchema
 
 class DBClient():
     def __init__(self):
@@ -17,14 +18,24 @@ class DBClient():
             # connection pool size
             pool_size=50,
             # pool overflow size
-            max_overflow=75
+            max_overflow=75,
+
+            # echo=True,
+            future=True
         )
 
-    def init_db(self):
-        SQLModel.metadata.create_all(self.engine)
+    async def create_schema(self, schema_name: str):
+        async with self.engine.begin() as conn:
+            await conn.execute(CreateSchema(schema_name, if_not_exists=True))
+            await conn.commit()
+
+
+    async def init_db(self):
+        async with self.engine.begin() as conn:
+            await conn.run_sync(SQLModel.metadata.create_all)
     
-    def disconnect(self):
-        self.engine.dispose()
+    async def disconnect(self):
+        await self.engine.dispose()
         self.engine = None
 
 

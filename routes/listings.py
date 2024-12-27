@@ -1,26 +1,28 @@
 from .. import crud
 from ..models import *
-from .deps import get_db
+from .deps import get_session
 from sqlmodel import Session, select
 from fastapi import APIRouter, Depends, HTTPException
+from sqlalchemy.ext.asyncio.session import AsyncSession
 
 
 listings_router = APIRouter()
 
 
 @listings_router.get("/")
-async def get_all_listings(db: Session = Depends(get_db)) -> ListingsPublic:
+async def get_all_listings(session: AsyncSession = Depends(get_session)) -> ListingsPublic:
     
     statement = select(Listing)
-    listings = db.exec(statement).all()
+    res = await session.execute(statement)
+    listings = res.scalars().all()
     
     return ListingsPublic(data=listings)
 
 
 @listings_router.get("/{id}")
-async def get_accommodation_by_id(id: int, db: Session = Depends(get_db)) -> Listing:
+async def get_accommodation_by_id(id: int, session: Session = Depends(get_session)) -> Listing:
 
-    accommodation = db.get(Listing, id)
+    accommodation = await session.get(Listing, id)
 
     if not accommodation:
         raise HTTPException(
@@ -32,8 +34,8 @@ async def get_accommodation_by_id(id: int, db: Session = Depends(get_db)) -> Lis
 
 
 @listings_router.post("/")
-async def create_listing(create_listing: CreateListing, session: Session = Depends(get_db)) -> CreateListingPublic:
-    listing = crud.create_listing(session, create_listing)
+async def create_listing(create_listing: CreateListing, session: Session = Depends(get_session)) -> CreateListingPublic:
+    listing = await crud.create_listing(session, create_listing)
 
     return CreateListingPublic(
         id=listing.id,
@@ -42,8 +44,8 @@ async def create_listing(create_listing: CreateListing, session: Session = Depen
 
 
 @listings_router.patch("/{id}")
-async def update_listing(id: int, update_listing: UpdateListing, session: Session = Depends(get_db)) -> UpdateListingPublic:
-    listing = session.get(Listing, id)
+async def update_listing(id: int, update_listing: UpdateListing, session: Session = Depends(get_session)) -> UpdateListingPublic:
+    listing = await session.get(Listing, id)
 
     if not listing:
         raise HTTPException(
@@ -51,7 +53,7 @@ async def update_listing(id: int, update_listing: UpdateListing, session: Sessio
             detail=f"Listing with id {id} does not exist"
         )
 
-    listing = crud.update_listing(session, listing, update_listing)
+    listing = await crud.update_listing(session, listing, update_listing)
 
     return UpdateListingPublic(
         listing=listing,
@@ -60,8 +62,8 @@ async def update_listing(id: int, update_listing: UpdateListing, session: Sessio
 
 
 @listings_router.delete("/id")
-async def delete_listing(id: int, session: Session = Depends(get_db)) -> DeleteListingPublic:
-    listing = session.get(Listing, id)
+async def delete_listing(id: int, session: Session = Depends(get_session)) -> DeleteListingPublic:
+    listing = await session.get(Listing, id)
 
     if not listing:
         raise HTTPException(
@@ -69,6 +71,6 @@ async def delete_listing(id: int, session: Session = Depends(get_db)) -> DeleteL
             detail=f"Listing with id {id} does not exist"
         )
     
-    crud.delete_listing(session, listing)
+    await crud.delete_listing(session, listing)
 
     return DeleteListingPublic(msg="Listing deleted successfully")

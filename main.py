@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from .core.config import config
 from .rabbit.client import mq_cl
 from contextlib import asynccontextmanager
-from sqlalchemy.schema import CreateSchema
 
 from .rabbit.handlers.cascade_delete import cascade_delete_handler
 
@@ -18,18 +17,16 @@ async def lifespan(_: FastAPI):
 
     # set up db
     db_cl.connect(str(config.DB_URI))
-    with db_cl.engine.connect() as conn:
-        conn.execute(CreateSchema(str(config.DB_SCHEMA), if_not_exists=True))
-        conn.commit()
+    await db_cl.create_schema(str(config.DB_SCHEMA))
 
     # create tables
-    db_cl.init_db()
+    await db_cl.init_db()
 
     yield
     
     # everything after yield is execute after the app shuts down
     await mq_cl.disconnect()
-    db_cl.disconnect()
+    await db_cl.disconnect()
 
 
 app = FastAPI(
