@@ -1,5 +1,5 @@
 from ..models import *
-from sqlmodel import Session, SQLModel
+from sqlmodel import SQLModel
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.schema import CreateSchema
 

@@ -1,6 +1,4 @@
-from sqlmodel import Session
 from ..core.db  import db_cl
-from collections.abc import Generator
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy.orm import sessionmaker
 
@@ -18,4 +16,3 @@ async def get_session() -> AsyncSession: # type: ignore
 
         # close session so queue pool doesn't overflow
         await session.close()
-        
