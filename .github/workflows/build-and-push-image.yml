@@ -1,6 +1,8 @@
 name: test workflow
 on:
     - push
+env:
+    IMG_NAME: ${{vars.DOCKERHUB_NAME}}/${{vars.DOCKERHUB_IMG_PREFIX}}-listing-api
 
 jobs:
     build-image:
@@ -28,7 +30,7 @@ jobs:
             - 
                 name: Run Docker container
                 run: |
-                    docker run -d -p 5000:5000  -e CI=true ${{vars.DOCKERHUB_IMAGE_NAME}}/${{vars.DOCKERHUB_IMG_PREFIX}}-listing-api:${{steps.short-sha.outputs.sha}}
+                    docker run -d -p 5000:5000  -e CI=true ${{env.IMG_NAME}}
                     sleep 30
                     docker network create web || true
                     docker run -d \
@@ -52,7 +54,7 @@ jobs:
                 name: build and push
                 uses: docker/build-push-action@v6
                 env:
-                    IMG_NAME: ${{vars.DOCKERHUB_NAME}}/${{vars.DOCKERHUB_IMG_PREFIX}}-listing-api
+                    IMG_NAME: ${{env.IMG_NAME}}
                 with:
                     push: true
                     platforms: linux/amd64, linux/arm64
