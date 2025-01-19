@@ -25,5 +25,9 @@ class Config(BaseSettings):
         default="amqp://guest:guest@mq/"
     )
 
+    CI: bool = Field(
+        default=False
+    )
+
 config = Config()
 print(config.model_dump())

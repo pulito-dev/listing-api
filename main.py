@@ -30,10 +30,16 @@ async def lifespan(_: FastAPI):
     await db_cl.disconnect()
 
 
-app = FastAPI(
-    title=config.TITLE,
-    lifespan=lifespan
-)
+if not config.CI:
+    app = FastAPI(
+        title=config.TITLE,
+        lifespan=lifespan
+    )
+else:
+    app = FastAPI(
+        title=config.TITLE
+    )
+
 
 
 from .routes.listings import listings_router

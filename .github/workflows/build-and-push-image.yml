@@ -1,6 +1,9 @@
 name: test workflow
 on:
     - push
+env:
+    CI: true
+    IMG_NAME: ${{vars.DOCKERHUB_NAME}}/${{vars.DOCKERHUB_IMG_PREFIX}}-listing-api
 
 jobs:
     build-image:
@@ -26,9 +29,16 @@ jobs:
             -
                 name: build and push
                 uses: docker/build-push-action@v6
-                env:
-                    IMG_NAME: ${{vars.DOCKERHUB_NAME}}/${{vars.DOCKERHUB_IMG_PREFIX}}-listing-api
                 with:
                     push: true
                     platforms: linux/amd64, linux/arm64
                     tags: ${{env.IMG_NAME}}:${{steps.short-sha.outputs.sha}}, ${{env.IMG_NAME}}:latest
+
+            -
+                name: ZAP Scan
+                uses: zaproxy/action-full-scan@v0.12.0
+                with:
+                    docker_name: ${{env.IMG_NAME}}
+                    target: "http://localhost:5000"
+
+
