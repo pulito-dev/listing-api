@@ -28,7 +28,7 @@ jobs:
             - 
                 name: Run Docker container
                 run: |
-                    docker run -d -p 5000:5000 ${{vars.DOCKERHUB_IMAGE_NAME}}/${{vars.DOCKERHUB_IMG_PREFIX}}-listing-api:${{steps.short-sha.outputs.sha}} -e CI=true
+                    docker run -d -p 5000:5000  -e CI=true ${{vars.DOCKERHUB_IMAGE_NAME}}/${{vars.DOCKERHUB_IMG_PREFIX}}-listing-api:${{steps.short-sha.outputs.sha}}
                     sleep 30
                     docker network create web || true
                     docker run -d \
