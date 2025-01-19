@@ -12,7 +12,8 @@ async def lifespan(_: FastAPI):
     # everything before yield is executed before the app starts up
     # set up rabbit
     await mq_cl.connect(str(config.RABBIT_URI))
-    await mq_cl.consume("listings.cascade_delete", cascade_delete_handler)
+    await mq_cl.consume("listings.cascade_delete.req", cascade_delete_handler)
+    await mq_cl.setup_rpc_queues()
     # await mq_cl.consume("listings.asdf
 
     # set up db

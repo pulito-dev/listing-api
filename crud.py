@@ -1,12 +1,21 @@
 from .models import *
-# from sqlmodel import select
-from sqlalchemy.ext.asyncio.session import AsyncSession
 from datetime import datetime
+from sqlmodel import select, col, delete
+from sqlalchemy.ext.asyncio.session import AsyncSession
 
 
 def get_listings_in_timeframe(session: AsyncSession, dt_from: datetime, dt_to: datetime):
     pass
 
+
+async def get_user_listings(session: AsyncSession, accommodation_ids: list[int]) -> list[Listing]:
+    statement = select(Listing).where(col(Listing.accommodation_id).in_(accommodation_ids))
+
+    res = await session.execute(statement)
+
+    listings = res.scalars().all()
+
+    return listings
 
 async def create_listing(session: AsyncSession, listing_create: CreateListing) -> Listing:
     listing = Listing.model_validate(
