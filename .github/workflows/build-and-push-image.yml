@@ -71,7 +71,7 @@ jobs:
                 run: |
                     aws eks update-kubeconfig --region ${{ vars.AWS_DEFAULT_REGION }} --name ${{ vars.AWS_EKS_CLUSTER_NAME }}
 
-                    kubectl set image deployment/listing-api ${{env.IMG_NAME}}:${{steps.short-sha.outputs.sha}}
+                    kubectl set image deployment/listing-api listing-api=${{env.IMG_NAME}}:${{steps.short-sha.outputs.sha}}
 
 
 
