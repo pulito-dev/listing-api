@@ -14,7 +14,6 @@ async def lifespan(_: FastAPI):
     await mq_cl.connect(str(config.RABBIT_URI))
     await mq_cl.consume("listings.cascade_delete.req", cascade_delete_handler)
     await mq_cl.setup_rpc_queues()
-    # await mq_cl.consume("listings.asdf
 
     # set up db
     db_cl.connect(str(config.DB_URI))
@@ -46,16 +45,3 @@ from .routes.listings import listings_router
 
 
 app.include_router(listings_router, prefix="/listings")
-
-
-# @app.api_route("/")
-# async def home():
-#     txt = "".join(random.choices(string.ascii_letters, k=4))
-#     await mq_cl.send_message("accommodations", {
-#         "random_id": txt
-#     })
-#     print(f"SENT: {txt}")
-
-#     return {
-#         "hello": "world"
-#     }
